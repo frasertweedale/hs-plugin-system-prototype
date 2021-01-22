@@ -4,12 +4,14 @@ import Plugin
 import qualified Plugin.Double
 import qualified Plugin.FlipNegate
 import qualified Plugin.ShootLasers
+import qualified Plugin.Offset
 
 plugins :: [Plugin Unconstrained]
 plugins =
   [ relax Plugin.FlipNegate.plugin
   , relax Plugin.ShootLasers.plugin
   , relax Plugin.Double.plugin
+  , relax (Plugin.Offset.mkPlugin 100)
   ]
 
 main :: IO ()
