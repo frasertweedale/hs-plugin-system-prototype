@@ -10,7 +10,7 @@ plugins :: [Plugin Unconstrained]
 plugins =
   [ relax Plugin.FlipNegate.plugin
   , relax Plugin.ShootLasers.plugin
-  , relax Plugin.Double.plugin
+  , relax (Plugin.Double.plugin :: Plugin Pure)
   , relax (Plugin.Offset.mkPlugin 100)
   ]
 
