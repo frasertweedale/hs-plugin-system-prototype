@@ -22,7 +22,7 @@ main = do
   i <- prompt "number (Int)"
 
   (j, doNegate') <- flip runStateT doNegate $
-    foldr (>=>) pure (fmap unPlugin plugins) i
+    foldr (>=>) pure (fmap pluginHook plugins) i
 
   -- print result
   putStr "result: " *> print (if doNegate' then negate j else j)

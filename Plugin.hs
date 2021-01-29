@@ -23,13 +23,16 @@ instance (CanRWState m, CanIO m) => Unconstrained m where
 
 
 -- ConstraintKinds required
-data Plugin ctx = Plugin { unPlugin :: forall m. (ctx m) => Int -> m Int }
+data Plugin ctx = Plugin
+  { pluginName :: String
+  , pluginHook :: forall m. (ctx m) => Int -> m Int
+  }
 
 -- UndecidableInstances and QuantifiedConstraints required
 relax
   :: (forall m. ctx' m => ctx m)
   => Plugin ctx -> Plugin ctx'
-relax (Plugin fs) = Plugin fs
+relax (Plugin n fs) = Plugin n fs
 
 addPlugin
   :: (forall m. ctx' m => ctx m)
