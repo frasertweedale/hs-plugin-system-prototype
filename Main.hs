@@ -6,13 +6,15 @@ import qualified Plugin.Double
 import qualified Plugin.FlipNegate
 import qualified Plugin.ShootLasers
 import qualified Plugin.Offset
+import qualified Plugin.Noop
 
 plugins :: [Plugin Unconstrained]
 plugins =
-  [ relax Plugin.FlipNegate.plugin
-  , relax Plugin.ShootLasers.plugin
+  [ relax Plugin.Noop.plugin
   , relax (Plugin.Double.plugin :: Plugin Pure)
   , relax (Plugin.Offset.mkPlugin 100)
+  , relax Plugin.FlipNegate.plugin
+  , relax Plugin.ShootLasers.plugin
   ]
 
 main :: IO ()
