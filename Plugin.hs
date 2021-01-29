@@ -2,6 +2,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 -- {-# LANGUAGE MultiParamTypeClasses #-}
 
@@ -19,6 +20,7 @@ type CanIO = MonadIO
 type CanError = MonadError Error
 
 class (CanRWState m, CanIO m) => Unconstrained m where
+-- requires FlexibleInstances and UndecidableInstances
 instance (CanRWState m, CanIO m) => Unconstrained m where
 
 
@@ -28,7 +30,7 @@ data Plugin ctx = Plugin
   , pluginHook :: forall m. (ctx m) => Int -> m Int
   }
 
--- UndecidableInstances and QuantifiedConstraints required
+-- QuantifiedConstraints required
 relax
   :: (forall m. ctx' m => ctx m)
   => Plugin ctx -> Plugin ctx'
