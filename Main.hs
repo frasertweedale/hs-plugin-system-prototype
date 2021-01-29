@@ -1,3 +1,4 @@
+import System.IO (hFlush, stdout)
 import Control.Monad.State
 
 import Plugin
@@ -17,8 +18,8 @@ plugins =
 main :: IO ()
 main = do
   -- read start values
-  doNegate <- putStr "negate number? [True|False]: " *> readLn
-  i <- putStr "number (Int): " *> readLn
+  doNegate <- prompt "negate number? [True|False]"
+  i <- prompt "number (Int)"
 
   (j, doNegate') <- flip runStateT doNegate $
     foldr (>=>) pure (fmap unPlugin plugins) i
@@ -27,3 +28,4 @@ main = do
   putStr "result: " *> print (if doNegate' then negate j else j)
 
   where
+    prompt s = putStr (s <> ": ") *> hFlush stdout *> readLn
