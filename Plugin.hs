@@ -41,6 +41,9 @@ addPlugin
   => Plugin ctx -> [Plugin ctx'] -> [Plugin ctx']
 addPlugin = (:) . relax
 
+newPlugin :: (forall m. ctx m => Pure m) => String -> Plugin ctx
+newPlugin n = Plugin n pure
+
 
 {-
 --- Read-only state class
