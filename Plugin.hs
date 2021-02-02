@@ -43,21 +43,3 @@ addPlugin = (:) . relax
 
 newPlugin :: (forall m. ctx m => Pure m) => String -> Plugin ctx
 newPlugin n = Plugin n pure
-
-
-{-
---- Read-only state class
--- Requires MultiParamTypeClasses
-class (Monad m) => MonadStateRead s m where
-  glimpse :: m s
-
-instance (Monad m) => MonadStateRead s (StateT s m) where
-  glimpse = get
-
-type CanROState = MonadStateRead Bool
-
-pluginROState :: Plugin CanROState
-pluginROState = Plugin (pure . (+6))
-
---plugins' = addPlugin pluginROState plugins
--}
