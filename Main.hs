@@ -10,7 +10,7 @@ import qualified Plugin.ShootLasers
 import qualified Plugin.Offset
 import qualified Plugin.Noop
 
-plugins :: [PluginDict Unconstrained]
+plugins :: [PluginDict]
 plugins =
     addPlugin Plugin.Noop.plugin
   . addPlugin Plugin.Double.plugin
@@ -30,8 +30,7 @@ main = do
 
   -- print result
   let s = show (if doNegate' then negate j else j)
-  s' <- flip evalStateT doNegate $
-    foldr (>=>) pure (fmap (getDisplayHook . displayHook) plugins) s
+  s' <- foldr (>=>) pure (fmap (getDisplayHook . displayHook) plugins) s
   putStr "result: " *> putStrLn s'
 
   where

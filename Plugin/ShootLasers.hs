@@ -9,3 +9,5 @@ plugin = Plugin "ShootLasers"
   ( InputHook $ \i -> i <$ liftIO (putStrLn "pew! pew!")
   , DisplayHook $ pure . intersperse ' '
   )
+
+_check = mkPluginDict plugin

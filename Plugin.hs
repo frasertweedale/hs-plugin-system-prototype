@@ -19,6 +19,8 @@ module Plugin
   , CanRWState
   , CanIO
   , Unconstrained
+
+  , mkPluginDict
   ) where
 
 import Control.Monad.State
@@ -43,30 +45,30 @@ newtype DisplayHook ctx =
   DisplayHook { getDisplayHook :: forall m. (ctx m) => String -> m String }
 
 -- ConstraintKinds required
-data PluginDict ctx = PluginDict
+data PluginDict = PluginDict
   { pluginName :: String
-  , inputHook :: InputHook ctx
-  , displayHook :: DisplayHook ctx
+  , inputHook :: InputHook Unconstrained
+  , displayHook :: DisplayHook CanIO
   }
 
-setInputHook :: InputHook ctx -> PluginDict ctx -> PluginDict ctx
+setInputHook :: InputHook Unconstrained -> PluginDict -> PluginDict
 setInputHook hook plug = plug { inputHook = hook }
 
-setDisplayHook :: DisplayHook ctx -> PluginDict ctx -> PluginDict ctx
+setDisplayHook :: DisplayHook CanIO -> PluginDict -> PluginDict
 setDisplayHook hook plug = plug { displayHook = hook }
 
-newPlugin :: (forall m. ctx m => Pure m) => String -> PluginDict ctx
+newPlugin :: String -> PluginDict
 newPlugin n = PluginDict n (InputHook pure) (DisplayHook pure)
 
 
 class Hook t where
-  setHook :: t -> PluginDict Unconstrained -> PluginDict Unconstrained
+  setHook :: t -> PluginDict -> PluginDict
 
 -- requires MonoLocalBinds (to silence warnings)
 instance (forall m. Unconstrained m => ctx m) => Hook (InputHook ctx) where
   setHook (InputHook f) = setInputHook (InputHook f)
 
-instance (forall m. Unconstrained m => ctx m) => Hook (DisplayHook ctx) where
+instance (forall m. CanIO m => ctx m) => Hook (DisplayHook ctx) where
   setHook (DisplayHook f) = setDisplayHook (DisplayHook f)
 
 instance (Hook h1, Hook h2) => Hook (h1, h2) where
@@ -77,10 +79,10 @@ instance Hook () where
 
 data Plugin hooks = Plugin String hooks
 
-mkPluginDict :: (Hook hooks) => Plugin hooks -> PluginDict Unconstrained
+mkPluginDict :: (Hook hooks) => Plugin hooks -> PluginDict
 mkPluginDict (Plugin name hook) = setHook hook (newPlugin name)
 
 addPlugin
   :: (Hook hooks)
-  => Plugin hooks -> [PluginDict Unconstrained] -> [PluginDict Unconstrained]
+  => Plugin hooks -> [PluginDict] -> [PluginDict]
 addPlugin = (:) . mkPluginDict
