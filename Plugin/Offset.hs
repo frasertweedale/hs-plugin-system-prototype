@@ -2,5 +2,5 @@ module Plugin.Offset where
 
 import Plugin
 
-mkPlugin :: Int -> Plugin Pure
-mkPlugin offset = Plugin "Offset" $ pure . (+ offset)
+mkPlugin :: Int -> Plugin (InputHook Pure)
+mkPlugin offset = Plugin "Offset" (InputHook (pure . (+ offset)))

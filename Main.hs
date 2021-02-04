@@ -1,3 +1,5 @@
+module Main where
+
 import System.IO (hFlush, stdout)
 import Control.Monad.State
 
@@ -8,14 +10,14 @@ import qualified Plugin.ShootLasers
 import qualified Plugin.Offset
 import qualified Plugin.Noop
 
-plugins :: [Plugin Unconstrained]
+plugins :: [PluginDict Unconstrained]
 plugins =
-  [ relax Plugin.Noop.plugin
-  , relax (Plugin.Double.plugin :: Plugin Pure)
-  , relax (Plugin.Offset.mkPlugin 100)
-  , relax Plugin.FlipNegate.plugin
-  , relax Plugin.ShootLasers.plugin
-  ]
+    addPlugin Plugin.Noop.plugin
+  . addPlugin Plugin.Double.plugin
+  . addPlugin (Plugin.Offset.mkPlugin 100)
+  . addPlugin Plugin.FlipNegate.plugin
+  . addPlugin Plugin.ShootLasers.plugin
+  $ []
 
 main :: IO ()
 main = do
@@ -24,10 +26,13 @@ main = do
   i <- prompt "number (Int)"
 
   (j, doNegate') <- flip runStateT doNegate $
-    foldr (>=>) pure (fmap pluginHook plugins) i
+    foldr (>=>) pure (fmap (getInputHook . inputHook) plugins) i
 
   -- print result
-  putStr "result: " *> print (if doNegate' then negate j else j)
+  let s = show (if doNegate' then negate j else j)
+  s' <- flip evalStateT doNegate $
+    foldr (>=>) pure (fmap (getDisplayHook . displayHook) plugins) s
+  putStr "result: " *> putStrLn s'
 
   where
     prompt s = putStr (s <> ": ") *> hFlush stdout *> readLn

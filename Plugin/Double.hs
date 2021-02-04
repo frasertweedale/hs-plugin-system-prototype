@@ -2,5 +2,5 @@ module Plugin.Double where
 
 import Plugin
 
-plugin :: Plugin Pure
-plugin = Plugin "Double" $ pure . (*2)
+plugin :: Plugin (InputHook Pure)
+plugin = Plugin "Double" (InputHook (pure . (*2)))
